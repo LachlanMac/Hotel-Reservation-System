@@ -83,8 +83,6 @@ public class Reservation {
 			reservationDates.add(df.format(newDate));
 
 			newDate.setDate(newDate.getDate() + 1);
-			
-			System.out.println(newDate.toString());
 
 		}
 
