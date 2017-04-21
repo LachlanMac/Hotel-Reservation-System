@@ -63,17 +63,12 @@ public class Reservation {
 
 	}
 
-	public void calculateDates(String checkInDate, String checkOutDate) {
+	public ArrayList<String> calculateDates(String checkInDate, String checkOutDate) {
 		reservationDates = new ArrayList<String>();
 		cal = Calendar.getInstance();
 		Date checkIn = parseDate(checkInDate);
 		Date checkOut = parseDate(checkOutDate);
 		Date newDate = checkIn;
-
-		System.out.println(checkIn.toString());
-		System.out.println(checkOut.toString());
-		System.out.println(newDate.toString());
-
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
 		// reservationDates.add(df.format(newDate));
@@ -88,9 +83,8 @@ public class Reservation {
 
 		reservationDates.add(df.format(checkOut));
 
-		for (String r : reservationDates) {
-			System.out.println(r);
-		}
+		return reservationDates;
+
 	}
 
 	private Date parseDate(String date) {

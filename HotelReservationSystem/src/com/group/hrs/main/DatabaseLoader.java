@@ -1,19 +1,23 @@
 package com.group.hrs.main;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+public class DatabaseLoader {
 
-public class DatabaseLoader{
-
-    static //Serach database for ID and get all customer information
-    String host = "jdbc:mysql://localhost:3306/HotelReservation";
-    static String username = "root";
-    static String password = "Movingon1";
+    //Serach database for ID and get all customer information
+    String host = "jdbc:mysql://localhost:3307/HotelReservation";
+    String username = "root";
+    String password = "Movingon1";
 
     public Reservation getReservationByID(int reservationID) throws SQLException {
         //Statement that connects to database
@@ -85,28 +89,46 @@ public class DatabaseLoader{
 
     }
 
-    //Return an array that displays avaliable rooms 
-    public static void arrayReservation(String date) throws SQLException {
-    	Connection con = DriverManager.getConnection(host, username, password);
-    	PreparedStatement searchStatement = con.prepareStatement("SELECT * FROM Reservation WHERE StartDate = ?");
-    	
-    	
-    	 ResultSet rs = searchStatement.executeQuery();
-    	while(rs.next()){
-    		
-    		System.out.println(rs.getString("Room_Number"));
-    		
-    	}
-    	
-    	
-    	
+    //Return an array that displays avaliable rooms for the selected date
+    public Boolean[] LookUpByDate(String date) throws SQLException {
+        //Statement that connects to database
+        Connection con = DriverManager.getConnection(host, username, password);
+
+        int roomID = 0;
+        int roomNumber = 0;
+        ArrayList occupiedRooms = new ArrayList();
+        Boolean[] roomList = new Boolean[9];
+
+        for(int start = 1; start < roomList.length; start++){
+            roomList[start] = false;
+        }
+        
+        //Get the roomID along with the date that it's occupied with
+        PreparedStatement lookUpDate = con.prepareStatement("SELECT RoomID FROM Reservation WHERE (Day1 = ?) OR (Day2 = ?) OR (Day3 = ?) OR (Day4 = ?) OR (Day5 = ?) OR (Day6 = ?) OR (Day7 = ?)");
+        lookUpDate.setString(1, date);
+        lookUpDate.setString(2, date);
+        lookUpDate.setString(3, date);
+        lookUpDate.setString(4, date);
+        lookUpDate.setString(5, date);
+        lookUpDate.setString(6, date);
+        lookUpDate.setString(7, date);
+        ResultSet rs = lookUpDate.executeQuery();
+
+        //Initialize roomID
+        while (rs.next()) {
+            roomID = rs.getInt("RoomID");
+            roomList[roomID] = true;
+        }
+
+        
+        return roomList;
     }
 
     //Call the reservation's get methods and submit the data to database
     public void submitReservation(Reservation reservation) throws SQLException {
         int customerID = 0;
         int roomID = 0;
-        
+
         //Statement that connects to database
         Connection con = DriverManager.getConnection(host, username, password);
 
@@ -128,25 +150,24 @@ public class DatabaseLoader{
         searchCustomer.setString(1, reservation.getFirst());
         searchCustomer.setString(2, reservation.getLast());
         ResultSet rs = searchCustomer.executeQuery();
-        while(rs.next()){
+        while (rs.next()) {
             customerID = rs.getInt("CustomerID");
         }
-         
+
         //Inserts CustomerID into Room table to ensure that room is occupied
         String insertOccupiedRoom = "UPDATE Room SET CustomerID = ? WHERE Room_Number = ?";
         PreparedStatement insertOccupiedRoomCommand = con.prepareStatement(insertOccupiedRoom);
         insertOccupiedRoomCommand.setInt(1, customerID);
         insertOccupiedRoomCommand.setInt(2, reservation.getRoom());
         insertOccupiedRoomCommand.executeUpdate();
-        
-        
+
         PreparedStatement searchRoom = con.prepareStatement("SELECT RoomID FROM Room WHERE Room_Number = ?");
         searchRoom.setInt(1, reservation.getRoom());
         ResultSet rs2 = searchRoom.executeQuery();
-        while(rs2.next()){
+        while (rs2.next()) {
             roomID = rs2.getInt("RoomID");
         }
-        
+
         //Inserts reservation information
         PreparedStatement insertReservationCommand = con.prepareStatement("INSERT INTO Reservation(CustomerID, RoomID, StartDate, EndDate)"
                 + "VALUES(?, ?, ?, ?)");
@@ -157,6 +178,5 @@ public class DatabaseLoader{
         insertReservationCommand.execute();
     }
 
- 
 
 }

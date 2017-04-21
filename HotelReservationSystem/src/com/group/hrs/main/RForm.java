@@ -52,6 +52,14 @@ public class RForm {
 	public RForm() {
 		createForm();
 	}
+	
+	public RForm(Reservation r){
+		createForm();
+		
+		//fillForm();
+			
+		
+	}
 
 	public void createForm() {
 
