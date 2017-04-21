@@ -1,5 +1,8 @@
 package com.group.hrs.main;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -20,7 +23,7 @@ public class Reservation {
 	public String checkInDate;
 	public String checkOutDate;
 
-	public RDate[] reservationDates = new RDate[7];
+	public ArrayList<String> reservationDates;
 
 	private Calendar cal;
 
@@ -61,28 +64,35 @@ public class Reservation {
 	}
 
 	public void calculateDates(String checkInDate, String checkOutDate) {
-
+		reservationDates = new ArrayList<String>();
+		cal = Calendar.getInstance();
 		Date checkIn = parseDate(checkInDate);
 		Date checkOut = parseDate(checkOutDate);
 		Date newDate = checkIn;
 
-		
-	
-		
-		int dateCounter = 1;
-		boolean reachedCheckout = false;
+		System.out.println(checkIn.toString());
+		System.out.println(checkOut.toString());
+		System.out.println(newDate.toString());
 
-		while (!reachedCheckout) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-			if (newDate.before(checkOut)) {
+		// reservationDates.add(df.format(newDate));
 
-			} else {
-				dateCounter++;
+		while (newDate.before(checkOut)) {
 
-			}
+			reservationDates.add(df.format(newDate));
+
+			newDate.setDate(newDate.getDate() + 1);
+			
+			System.out.println(newDate.toString());
 
 		}
 
+		reservationDates.add(df.format(checkOut));
+
+		for (String r : reservationDates) {
+			System.out.println(r);
+		}
 	}
 
 	private Date parseDate(String date) {
@@ -92,8 +102,16 @@ public class Reservation {
 		int month = Integer.parseInt(tokens[1]);
 		int day = Integer.parseInt(tokens[2]);
 
+		System.out.println(month);
 		cal.set(year, month, day, 0, 0);
 		return cal.getTime();
+
+	}
+
+	public String toString() {
+
+		return this.rFirstName + " " + this.rLastName + this.rEmailAddress + this.rStreet + this.rCity + this.rState
+				+ " " + this.checkInDate + " " + this.checkOutDate + " " + this.rRoomNumber;
 
 	}
 

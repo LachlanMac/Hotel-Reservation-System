@@ -1,12 +1,14 @@
 package com.group.hrs.main;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -26,6 +28,8 @@ public class RForm {
 			"NORTH CAROLINA", "NORTH DAKOTA", "OHIO", "OKLAHOMA", "OREGON", "PENNSYLVANIA", "RHODE ISLAND",
 			"SOUTH CAROLINA", "SOUTH DAKOTA", "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON",
 			"WEST VIRGINIA", "WISCONSIN", "WYOMING" };
+
+	CalendarTool calObject;
 
 	JLabel[] labels;
 	JTextField[] textFields;
@@ -79,7 +83,7 @@ public class RForm {
 
 		calendarTool.addActionListener((ActionEvent event) -> {
 
-			new CalendarTool(this);
+			calObject = new CalendarTool(this);
 		});
 
 		id_Label = new JLabel("ID:");
@@ -161,32 +165,62 @@ public class RForm {
 
 				Reservation currentReservation = new Reservation();
 
-				currentReservation.setFirstName(fName_Field.getText());
-
-				currentReservation.setLastName(lName_Field.getText());
-
-				currentReservation.setStreet(streetAddress_Field.getText());
-
-				currentReservation.setCity(city_Field.getText());
-
-				currentReservation.setState(stateCombo.getSelectedItem().toString());
 				if (currentReservation.getState().equals("select state")) {
 					JOptionPane.showMessageDialog(form, "Please select a state.");
-				}
-				currentReservation.setZip(zip_Field.getText());
-				if (zip_Field.getText().length() != 5) {
-					JOptionPane.showMessageDialog(form, "Please Enter a valid Zip Code.");
-				}
-				currentReservation.setPhone(phone_Field.getText());
-				if (phone_Field.getText().length() != 10) {
-					JOptionPane.showMessageDialog(form, "Please Enter a valid Phone number like '5555555555'.");
-				}
-				currentReservation.setEmail(email_Field.getText());
-				if (!email_Field.getText().contains("@") || !email_Field.getText().contains(".")) {
-					JOptionPane.showMessageDialog(form, "Please Enter a valid email Address");
+
 				}
 
-				currentReservation.calculateDates(checkin_Field.getText(), checkout_Field.getText());
+				else if (zip_Field.getText().length() != 5) {
+					JOptionPane.showMessageDialog(form, "Please Enter a valid Zip Code.");
+
+				}
+
+				else if (phone_Field.getText().length() != 10) {
+					JOptionPane.showMessageDialog(form, "Please Enter a valid Phone number like '5555555555'.");
+
+				}
+
+				else if (!email_Field.getText().contains("@") || !email_Field.getText().contains(".")) {
+					JOptionPane.showMessageDialog(form, "Please Enter a valid email Address");
+
+				} else if (calObject.getCheckinDate() == null) {
+					JOptionPane.showMessageDialog(form, "Please Select a Valid Checkin Date");
+
+				} else if (calObject.getCheckoutDate() == null) {
+					JOptionPane.showMessageDialog(form, "Please Select a Valid Checkout Date");
+
+				}
+
+				else if (room_Field.getText().equals("")) {
+					JOptionPane.showMessageDialog(form, "Select a room!");
+
+				} else {
+					submit.setBackground(Color.green);
+					// DatabaseLoader dbl = new DatabaseLoader();
+					// dbl.submitReservation(currentReservation);
+					currentReservation.setFirstName(fName_Field.getText());
+
+					currentReservation.setLastName(lName_Field.getText());
+
+					currentReservation.setStreet(streetAddress_Field.getText());
+
+					currentReservation.setCity(city_Field.getText());
+
+					currentReservation.setState(stateCombo.getSelectedItem().toString());
+
+					currentReservation.setPhone(phone_Field.getText());
+
+					currentReservation.setZip(zip_Field.getText());
+
+					currentReservation.setCheckInDate(checkin_Field.getText());
+
+					currentReservation.setEmail(email_Field.getText());
+
+					currentReservation.setCheckOutDate(checkout_Field.getText());
+
+					currentReservation.setRoom(Integer.parseInt(room_Field.getText()));
+
+				}
 
 			}
 		});
@@ -203,6 +237,12 @@ public class RForm {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				Reservation currentReservation = new Reservation();
+				
+				currentReservation.setCheckInDate(checkin_Field.getText());
+				currentReservation.setCheckOutDate(checkout_Field.getText());
+				
+				currentReservation.calculateDates(currentReservation.getInDate(), currentReservation.getOutDate());
 
 			}
 		});
