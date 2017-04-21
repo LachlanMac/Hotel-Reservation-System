@@ -204,8 +204,12 @@ public class RForm {
 
 				} else {
 					submit.setBackground(Color.green);
-					// DatabaseLoader dbl = new DatabaseLoader();
-					// dbl.submitReservation(currentReservation);
+					DatabaseLoader dbl = new DatabaseLoader();
+					
+					
+					
+					
+					
 					currentReservation.setFirstName(fName_Field.getText());
 
 					currentReservation.setLastName(lName_Field.getText());
@@ -228,6 +232,13 @@ public class RForm {
 
 					currentReservation.setRoom(Integer.parseInt(room_Field.getText()));
 
+					try {
+						dbl.submitReservation(currentReservation);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
 				}
 
 			}

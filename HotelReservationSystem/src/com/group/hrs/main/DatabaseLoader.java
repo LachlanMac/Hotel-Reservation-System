@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DatabaseLoader {
+public class DatabaseLoader{
 
     //Serach database for ID and get all customer information
-    String host = "jdbc:mysql://localhost:3307/HotelReservation";
+    String host = "jdbc:mysql://localhost:3306/HotelReservation";
     String username = "root";
     String password = "Movingon1";
 
@@ -99,12 +99,12 @@ public class DatabaseLoader {
         ArrayList occupiedRooms = new ArrayList();
         Boolean[] roomList = new Boolean[9];
 
-        for(int start = 1; start < roomList.length; start++){
+        for (int start = 1; start < roomList.length; start++) {
             roomList[start] = false;
         }
-        
+
         //Get the roomID along with the date that it's occupied with
-        PreparedStatement lookUpDate = con.prepareStatement("SELECT RoomID FROM Reservation WHERE (Day1 = ?) OR (Day2 = ?) OR (Day3 = ?) OR (Day4 = ?) OR (Day5 = ?) OR (Day6 = ?) OR (Day7 = ?)");
+        PreparedStatement lookUpDate = con.prepareStatement("SELECT RoomID FROM Reservation WHERE (Day1 = ? OR (Day2 = ?) OR (Day3 = ?) OR (Day4 = ?) OR (Day5 = ?) OR (Day6 = ?) OR (Day7 = ?)");
         lookUpDate.setString(1, date);
         lookUpDate.setString(2, date);
         lookUpDate.setString(3, date);
@@ -120,7 +120,6 @@ public class DatabaseLoader {
             roomList[roomID] = true;
         }
 
-        
         return roomList;
     }
 
@@ -176,7 +175,85 @@ public class DatabaseLoader {
         insertReservationCommand.setString(3, reservation.getInDate());
         insertReservationCommand.setString(4, reservation.getOutDate());
         insertReservationCommand.execute();
-    }
 
+        //Find the reservation by ID by looking up the information that was just inserted
+        int reservationID = 0;
+        PreparedStatement findReservationID = con.prepareStatement("SELECT ReservationID FROM Reservation WHERE (CustomerID = ?) AND (RoomID = ?) AND (StartDate = ?) AND (EndDate = ?)");
+        findReservationID.setInt(1, customerID);
+        findReservationID.setInt(2, roomID);
+        findReservationID.setString(3, reservation.getInDate());
+        findReservationID.setString(4, reservation.getOutDate());
+        ResultSet findID = findReservationID.executeQuery();
+        while (findID.next()) {
+            reservationID = findID.getInt("ReservationID");
+        }
+
+        //
+        ArrayList<String> getDates = new ArrayList<String>();
+        getDates = reservation.calculateDates(reservation.getInDate(), reservation.getOutDate());
+
+        
+        System.out.println("GETDATE LENGTH" + getDates.size());
+        
+        for(String s : getDates){
+         
+         System.out.println(s);
+        }
+        
+        if (getDates.size() == 2) {
+            PreparedStatement insertDays = con.prepareStatement("UPDATE Reservation SET Day1 = ?, Day2 = ? WHERE ReservationID = ?");
+            insertDays.setString(1, getDates.get(0));
+            insertDays.setString(2, getDates.get(1));
+            insertDays.setInt(3, reservationID);
+            insertDays.executeUpdate();
+        } else if (getDates.size() == 3) {
+            PreparedStatement insertDays = con.prepareStatement("UPDATE Reservation SET Day1 = ?, Day2 = ?, Day3 = ? WHERE ReservationID = ?");
+            insertDays.setString(1, getDates.get(0));
+            insertDays.setString(2, getDates.get(1));
+            insertDays.setString(3, getDates.get(2));
+            insertDays.setInt(4, reservationID);
+            insertDays.executeUpdate();
+        } else if (getDates.size() == 4) {
+            PreparedStatement insertDays = con.prepareStatement("UPDATE Reservation SET Day1 = ?, Day2 = ?, Day3 = ?, Day4 = ? WHERE ReservationID = ?");
+            insertDays.setString(1, getDates.get(0));
+            insertDays.setString(2, getDates.get(1));
+            insertDays.setString(3, getDates.get(2));
+            insertDays.setString(4, getDates.get(3));
+            insertDays.setInt(5, reservationID);
+            insertDays.executeUpdate();
+        }else if(getDates.size() == 5){
+            PreparedStatement insertDays = con.prepareStatement("UPDATE Reservation SET Day1 = ?, Day2 = ?, Day3 = ?, Day4 = ?, Day5 = ? WHERE ReservationID = ?");
+            insertDays.setString(1, getDates.get(0));
+            insertDays.setString(2, getDates.get(1));
+            insertDays.setString(3, getDates.get(2));
+            insertDays.setString(4, getDates.get(3));
+            insertDays.setString(5, getDates.get(4));
+            insertDays.setInt(6, reservationID);
+            insertDays.executeUpdate();
+        }else if(getDates.size() == 6){
+            PreparedStatement insertDays = con.prepareStatement("UPDATE Reservation SET Day1 = ?, Day2 = ?, Day3 = ?, Day4 = ?, Day5 = ?, Day6 = ? WHERE ReservationID = ?");
+            insertDays.setString(1, getDates.get(0));
+            insertDays.setString(2, getDates.get(1));
+            insertDays.setString(3, getDates.get(2));
+            insertDays.setString(4, getDates.get(3));
+            insertDays.setString(5, getDates.get(4));
+            insertDays.setString(6, getDates.get(5));
+            insertDays.setInt(7, reservationID);
+            insertDays.executeUpdate();
+        }else if(getDates.size() == 7){
+            PreparedStatement insertDays = con.prepareStatement("UPDATE Reservation SET Day1 = ?, Day2 = ?, Day3 = ?, Day4 = ?, Day5 = ?, Day6 = ?, Day7 = ? WHERE ReservationID = ?");
+            insertDays.setString(1, getDates.get(0));
+            insertDays.setString(2, getDates.get(1));
+            insertDays.setString(3, getDates.get(3));
+            insertDays.setString(4, getDates.get(4));
+            insertDays.setString(5, getDates.get(5));
+            insertDays.setString(6, getDates.get(6));
+            insertDays.setString(7, getDates.get(7));
+            insertDays.setInt(8, reservationID);
+            insertDays.executeUpdate();
+        }
+
+    }// end method
 
 }
+

@@ -82,7 +82,8 @@ public class Reservation {
 		}
 
 		reservationDates.add(df.format(checkOut));
-
+		
+		
 		return reservationDates;
 
 	}
@@ -94,7 +95,6 @@ public class Reservation {
 		int month = Integer.parseInt(tokens[1]);
 		int day = Integer.parseInt(tokens[2]);
 
-		System.out.println(month);
 		cal.set(year, month, day, 0, 0);
 		return cal.getTime();
 
