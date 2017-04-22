@@ -3,7 +3,7 @@ package com.group.hrs.main;
 import java.sql.*;
 
 public class Authenticator {
-
+	//Author : Kristina Villa
 	static Connection con;
 
 	public static boolean validate(String username, String password) {

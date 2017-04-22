@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+
+//AUTHOR : Lachlan McCallum Geoffery Quintern
+
 public class Reservation {
 	// Class variables
 	public int rID;

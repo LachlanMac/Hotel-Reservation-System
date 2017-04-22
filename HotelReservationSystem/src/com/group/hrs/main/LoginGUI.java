@@ -12,9 +12,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 
+
+//AUTHOR KRISTINA VILLA
+
 /*
 FIGURE OUT THE 3 TIMES GET KICKED OUT THING IF USER ISN'T AUTHENTICATED
-ADD THE LOGGED IN AS:
+ADD THE LOGGED IN AS:  
 */
 
 public class LoginGUI extends JFrame implements ActionListener {

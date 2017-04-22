@@ -61,10 +61,10 @@ public class RDate extends JButton {
 		if (day == 0)
 			display = "";
 		else {
-			// sets the text of the button to equal the day number
+			// String that equates to the day numberr
 			display = Integer.toString(day);
 		}
-
+		//sets the text of the button to equal the display string
 		this.setText(display);
 		// Assign class variables to hold date data
 		this.day = day;

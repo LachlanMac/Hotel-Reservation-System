@@ -61,7 +61,7 @@ public class RForm {
 	private JComboBox<String> stateCombo;
 	// Layout Manager
 	private SpringLayout layout;
-	private JButton calendarTool;
+	private JButton calendarToolButton;
 	// Preferred size of form
 	private Dimension dim = new Dimension(600, 600);
 	// Labels
@@ -78,10 +78,13 @@ public class RForm {
 	 * CREATE NEW FORM CONSTRUCTOR
 	 *******************************************/
 	public RForm() {
+
+		// creates an empty Reservation object
+		currentReservation = new Reservation();
+
 		// creates a blank form
 		createForm();
-		// cannot cancel an unsubmitted reservation
-		cancel.setEnabled(false);
+
 	}
 
 	/********************************************
@@ -101,10 +104,6 @@ public class RForm {
 		}
 		// creates the form that will be populated
 		loadForm();
-		// enable cancel button because a reservation can be canceled
-		cancel.setEnabled(true);
-		// fill form with reservation data
-		fillForm();
 
 	}
 
@@ -133,14 +132,14 @@ public class RForm {
 		}
 
 	}
-	
+
 	/********************************************
-	 * buildForm Method : This method builds the initial form with out
-	 * any fields set.   
+	 * buildForm Method : This method builds the initial form with out any
+	 * fields set.
 	 *******************************************/
 	public void buildForm() {
-		
-		//Initialize JFrame and Parameters
+
+		// Initialize JFrame and Parameters
 		form = new JFrame();
 		form.setTitle("Reservation Form");
 		form.setSize(dim);
@@ -148,7 +147,7 @@ public class RForm {
 		form.setLocationRelativeTo(null);
 		form.setLayout(new BorderLayout());
 		layout = new SpringLayout();
-		
+
 		calendarPanel = new JPanel();
 
 		actionpanel = new JPanel();
@@ -158,19 +157,18 @@ public class RForm {
 
 		formPanel = new JPanel();
 		formPanel.setLayout(layout);
-
+		// add panels to frame with Border Layout
 		form.add(formPanel, BorderLayout.CENTER);
 		form.add(calendarPanel, BorderLayout.NORTH);
 		form.add(actionpanel, BorderLayout.PAGE_END);
+		// Create button that opens the calendar Tool
+		calendarToolButton = new JButton("Calendar Tool");
+		calendarToolButton.setPreferredSize(new Dimension(160, 160));
+		calendarPanel.add(calendarToolButton);
 
-		calendarTool = new JButton("Calendar Tool");
-		calendarTool.setPreferredSize(new Dimension(160, 160));
-		calendarPanel.add(calendarTool);
-
-		calendarTool.addActionListener((ActionEvent event) -> {
-
-			calObject = new CalendarTool(this);
-		});
+		/********************************************
+		 * inits all labels and fields and puts them into arrays for iteration
+		 *******************************************/
 
 		id_Label = new JLabel("ID:");
 		id_Field = new JTextField(5);
@@ -214,8 +212,10 @@ public class RForm {
 		textFields = new JTextField[] { id_Field, fName_Field, lName_Field, streetAddress_Field, city_Field, zip_Field,
 				email_Field, phone_Field, room_Field, checkin_Field, checkout_Field };
 
+		// Start variable to track Y Coordinates of components
 		int spacing = 0;
 
+		// For every Label and Field pair, add to JPanel and set Spring Location
 		for (int k = 0; k < labels.length; k++) {
 			spacing = spacing + 25;
 			formPanel.add(labels[k]);
@@ -226,18 +226,17 @@ public class RForm {
 			layout.putConstraint(SpringLayout.WEST, textFields[k], 150, SpringLayout.WEST, formPanel);
 
 		}
-
+		// combo box to hold states
 		stateCombo = new JComboBox<String>();
-
+		// add all states to combobox options
 		for (int i = 0; i < states.length; i++) {
 
 			stateCombo.addItem(states[i]);
 		}
-
+		// add combobxo to statepanel
 		formPanel.add(stateCombo);
-		// this sets the Top left corner?
+		// set location of combobox
 		layout.putConstraint(SpringLayout.WEST, stateCombo, 220, SpringLayout.WEST, zip_Label);
-		// this sets the Y axis?
 		layout.putConstraint(SpringLayout.NORTH, stateCombo, 0, SpringLayout.NORTH, zip_Label);
 		JLabel state_Label = new JLabel("State:");
 		formPanel.add(state_Label);
@@ -252,139 +251,51 @@ public class RForm {
 			}
 		});
 
-		cancel.addActionListener(new ActionListener() {
+		// If calendarToolButton is pressed, open a new calendar Tool object
+		calendarToolButton.addActionListener((ActionEvent event) -> {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Reservation currentReservation = new Reservation();
-
-				currentReservation.setCheckInDate(checkin_Field.getText());
-				currentReservation.setCheckOutDate(checkout_Field.getText());
-
-				currentReservation.calculateDates(currentReservation.getInDate(), currentReservation.getOutDate());
-
-			}
+			calObject = new CalendarTool(this);
 		});
 
 		form.pack();
 		form.setVisible(true);
 		form.setLocationRelativeTo(null);
 
-	}
+	}// END METHOD
 
-	private void disableAllButtons() {
+	/********************************************
+	 * createForm Method : This method is used when a reservation is created
+	 * with all blank fields by the reservation GUI. The form is first built and
+	 * then attempts to parse filled in data when the submit button is clicked.
+	 *******************************************/
 
-		id_Field.setEnabled(false);
-		fName_Field.setEnabled(false);
-		lName_Field.setEnabled(false);
-		streetAddress_Field.setEnabled(false);
-		city_Field.setEnabled(false);
-		zip_Field.setEnabled(false);
-		email_Field.setEnabled(false);
-		phone_Field.setEnabled(false);
-		room_Field.setEnabled(false);
-		checkin_Field.setEnabled(false);
-		checkout_Field.setEnabled(false);
-		stateCombo.setEnabled(false);
+	public void createForm() {
 
-		calendarTool.setEnabled(false);
-
-	}
-
-	public void loadForm() {
-
+		// enable cancel button because a reservation can be canceled if it is
+		// not in the database
+		cancel.setEnabled(true);
+		// builds form gui
 		buildForm();
 
-		cancel.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-
-				int reply = JOptionPane.showConfirmDialog(null, "Are you sure you wish to cancel reservatioN?",
-						"cancel confirmation", JOptionPane.YES_NO_OPTION);
-				if (reply == JOptionPane.YES_OPTION) {
-
-					// CANCEL RESERVATION
-
-					JOptionPane.showMessageDialog(null, "Reservation Canceled");
-					cancel.setEnabled(false);
-					submit.setEnabled(false);
-					disableAllButtons();
-				} else {
-
-					// RESERVATION NOT CANCELED
-
-				}
-
-			}
-
-		});
-
+		// Action listener that handles text fields by verifying it, setting
+		// the reservation object fields and then submitting it into the
+		// database
 		submit.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
-				if (currentReservation.getState().equals("select state")) {
-					JOptionPane.showMessageDialog(form, "Please select a state.");
-
-				}
-
-				else if (zip_Field.getText().length() != 5) {
-					JOptionPane.showMessageDialog(form, "Please Enter a valid Zip Code.");
-
-				}
-
-				else if (phone_Field.getText().length() != 10) {
-					JOptionPane.showMessageDialog(form, "Please Enter a valid Phone number like '5555555555'.");
-
-				}
-
-				else if (!email_Field.getText().contains("@") || !email_Field.getText().contains(".")) {
-					JOptionPane.showMessageDialog(form, "Please Enter a valid email Address");
-
-				} else if (calObject.getCheckinDate() == null) {
-					JOptionPane.showMessageDialog(form, "Please Select a Valid Checkin Date");
-
-				} else if (calObject.getCheckoutDate() == null) {
-					JOptionPane.showMessageDialog(form, "Please Select a Valid Checkout Date");
-
-				}
-
-				else if (room_Field.getText().equals("")) {
-					JOptionPane.showMessageDialog(form, "Select a room!");
-
-				} else {
-					submit.setBackground(Color.green);
-
-					currentReservation.setFirstName(fName_Field.getText());
-
-					currentReservation.setLastName(lName_Field.getText());
-
-					currentReservation.setStreet(streetAddress_Field.getText());
-
-					currentReservation.setCity(city_Field.getText());
-
-					currentReservation.setState(stateCombo.getSelectedItem().toString());
-
-					currentReservation.setPhone(phone_Field.getText());
-
-					currentReservation.setZip(zip_Field.getText());
-
-					currentReservation.setCheckInDate(checkin_Field.getText());
-
-					currentReservation.setEmail(email_Field.getText());
-
-					currentReservation.setCheckOutDate(checkout_Field.getText());
-
-					currentReservation.setRoom(Integer.parseInt(room_Field.getText()));
-
+				// if the data in the form parses correctly
+				if (verifyForm()) {
+					// set reservation object fields
+					setReservation();
 					try {
-
+						// new databaseloader object
 						DatabaseLoader dbl = new DatabaseLoader();
+						// submit reservation to database
 						dbl.submitReservation(currentReservation);
-
-						JOptionPane.showMessageDialog(null, "Reservation Submitted");
+						// show confirmation
+						JOptionPane.showMessageDialog(null, "Reservation Created");
+						submit.setBackground(Color.green);
 						disableAllButtons();
 
 					} catch (SQLException e1) {
@@ -399,75 +310,70 @@ public class RForm {
 
 	}
 
-	public void createForm() {
+	/********************************************
+	 * loadForm Method : This method is used when a reservation is loaded from
+	 * the ReservationGUI. The form GUI is built, then filled in with action
+	 * listeners custom for modifying the database
+	 *******************************************/
 
+	public void loadForm() {
+		// Form GUI is built
 		buildForm();
+		// Form is filled with Reservation data
+		fillForm();
+		// Add cancel reservation button action listener which deletes the
+		// loaded reservation from the database
+		cancel.addActionListener(new ActionListener() {
 
-		currentReservation = new Reservation();
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// tracks if yes or no is pressed when prompting to cancel
+				// reservation
+				int response = JOptionPane.showConfirmDialog(null, "Are you sure you wish to cancel reservatioN?",
+						"Cancel Confirmation", JOptionPane.YES_NO_OPTION);
+				// if yes
+				if (response == JOptionPane.YES_OPTION) {
+					// create new DatabaseLoader object
+					DatabaseLoader dbl = new DatabaseLoader();
+					try {
+						// Delete reservation by passing the ID
+						dbl.deleteReservationByID(currentReservation.getID());
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					// Show confirmation
+					JOptionPane.showMessageDialog(null, "Reservation Canceled");
+					// disable all buttons
 
+					disableAllButtons();
+				}
+
+			}
+
+		});
+		// Submit button action listener that parses the input information,
+		// deletes the old reservationa and replaces it with a new reservation
+		submit.setText("Modify Reservation");
 		submit.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
-				if (currentReservation.getState().equals("select state")) {
-					JOptionPane.showMessageDialog(form, "Please select a state.");
-
-				}
-
-				else if (zip_Field.getText().length() != 5) {
-					JOptionPane.showMessageDialog(form, "Please Enter a valid Zip Code.");
-
-				}
-
-				else if (phone_Field.getText().length() != 10) {
-					JOptionPane.showMessageDialog(form, "Please Enter a valid Phone number like '5555555555'.");
-
-				}
-
-				else if (!email_Field.getText().contains("@") || !email_Field.getText().contains(".")) {
-					JOptionPane.showMessageDialog(form, "Please Enter a valid email Address");
-
-				} else if (calObject.getCheckinDate() == null) {
-					JOptionPane.showMessageDialog(form, "Please Select a Valid Checkin Date");
-
-				} else if (calObject.getCheckoutDate() == null) {
-					JOptionPane.showMessageDialog(form, "Please Select a Valid Checkout Date");
-
-				}
-
-				else if (room_Field.getText().equals("")) {
-					JOptionPane.showMessageDialog(form, "Select a room!");
-
-				} else {
-					submit.setBackground(Color.green);
-
-					currentReservation.setFirstName(fName_Field.getText());
-
-					currentReservation.setLastName(lName_Field.getText());
-
-					currentReservation.setStreet(streetAddress_Field.getText());
-
-					currentReservation.setCity(city_Field.getText());
-
-					currentReservation.setState(stateCombo.getSelectedItem().toString());
-
-					currentReservation.setPhone(phone_Field.getText());
-
-					currentReservation.setZip(zip_Field.getText());
-
-					currentReservation.setCheckInDate(checkin_Field.getText());
-
-					currentReservation.setEmail(email_Field.getText());
-
-					currentReservation.setCheckOutDate(checkout_Field.getText());
-
-					currentReservation.setRoom(Integer.parseInt(room_Field.getText()));
+				// verifies the text fields
+				if (verifyForm()) {
+					// sets the reservation object data
+					setReservation();
 
 					try {
-
+						// new database laoder object
 						DatabaseLoader dbl = new DatabaseLoader();
+						// deletes the reservation from the database
+						dbl.deleteReservationByID(currentReservation.getID());
+						// submits a new reservation it it's place
 						dbl.submitReservation(currentReservation);
+						// Confirmation
+						submit.setBackground(Color.green);
+						JOptionPane.showMessageDialog(null, "Reservation Modified");
+						disableAllButtons();
 
 					} catch (SQLException e1) {
 
@@ -477,11 +383,121 @@ public class RForm {
 				}
 
 			}
+
 		});
 
+	}// END METHOD
+
+	/********************************************
+	 * verifyForm Method : This method verifies that the information will be
+	 * parsed correctly to avoid errors or bad submits to the database. the
+	 * Method checks each field to ensure that the data is valid
+	 *******************************************/
+	public boolean verifyForm() {
+		// checks state field to make sure it is not default value
+		if (currentReservation.getState().equals("select state")) {
+			JOptionPane.showMessageDialog(form, "Please select a state.");
+			return false;
+		}
+		// checks zip code field
+		else if (zip_Field.getText().length() != 5) {
+			JOptionPane.showMessageDialog(form, "Please Enter a valid Zip Code.");
+			return false;
+		}
+		// checks phone number field to ensure it is 10 digits long
+		else if (phone_Field.getText().length() != 10) {
+			JOptionPane.showMessageDialog(form, "Please Enter a 10-digit phone number.");
+			return false;
+		}
+		// checks email field to ensure it has an @ and . symbol
+		else if (!email_Field.getText().contains("@") || !email_Field.getText().contains(".")) {
+			JOptionPane.showMessageDialog(form, "Please Enter a valid email Address");
+			return false;
+		}
+		// checks check in date field to make sure it is not null
+		else if (checkin_Field.getText().trim().equals("")) {
+			JOptionPane.showMessageDialog(form, "Please Select a Valid Checkin Date");
+			return false;
+		}
+		// checks check out date field to make sure it is not null
+		else if (checkout_Field.getText().trim().equals("")) {
+			JOptionPane.showMessageDialog(form, "Please Select a Valid Checkout Date");
+			return false;
+		}
+		// checks room field to make sure it was selected
+		else if (room_Field.getText().trim().equals("")) {
+			JOptionPane.showMessageDialog(form, "Please select a room.");
+			return false;
+		}
+		// Else there are no errors and return true
+		else {
+			return true;
+		}
 	}
 
-	
+	/********************************************
+	 * setReservation Method : This method parses the information from the text
+	 * fields and fills them into the reservation object by calling setters
+	 * 
+	 *******************************************/
+
+	public void setReservation() {
+
+		currentReservation.setFirstName(fName_Field.getText());
+
+		currentReservation.setLastName(lName_Field.getText());
+
+		currentReservation.setStreet(streetAddress_Field.getText());
+
+		currentReservation.setCity(city_Field.getText());
+
+		currentReservation.setState(stateCombo.getSelectedItem().toString());
+
+		currentReservation.setPhone(phone_Field.getText());
+
+		currentReservation.setZip(zip_Field.getText());
+
+		currentReservation.setCheckInDate(checkin_Field.getText());
+
+		currentReservation.setEmail(email_Field.getText());
+
+		currentReservation.setCheckOutDate(checkout_Field.getText());
+
+		currentReservation.setRoom(Integer.parseInt(room_Field.getText()));
+
+	}// END METHOD
+
+	/********************************************
+	 * disableAllButtons Method : This method disables all the fields and
+	 * buttons which is used after a change has been made to the database to
+	 * prevent data not syncing
+	 *******************************************/
+	private void disableAllButtons() {
+
+		cancel.setEnabled(false);
+		submit.setEnabled(false);
+
+		id_Field.setEnabled(false);
+		fName_Field.setEnabled(false);
+		lName_Field.setEnabled(false);
+		streetAddress_Field.setEnabled(false);
+		city_Field.setEnabled(false);
+		zip_Field.setEnabled(false);
+		email_Field.setEnabled(false);
+		phone_Field.setEnabled(false);
+		room_Field.setEnabled(false);
+		checkin_Field.setEnabled(false);
+		checkout_Field.setEnabled(false);
+		stateCombo.setEnabled(false);
+
+		calendarToolButton.setEnabled(false);
+
+	}// END METHOD
+
+	/********************************************
+	 				* GETTERSs *
+	 *******************************************/
+
 	public String getCheckout_Field() {
 		return checkout_Field.getText();
 	}
@@ -489,7 +505,7 @@ public class RForm {
 	public String getCheckIn_Field() {
 		return checkin_Field.getText();
 	}
-	
+
 	public Reservation getCurrentReservation() {
 		return currentReservation;
 
@@ -501,6 +517,9 @@ public class RForm {
 
 	}
 
+	/********************************************
+	 				* SETTERS *
+	 *******************************************/
 	public void setCheckoutDate(String checkout) {
 
 		this.checkout_Field.setText(checkout);
@@ -512,4 +531,4 @@ public class RForm {
 		this.room_Field.setText(roomNum);
 
 	}
-}
+}//END CLASS

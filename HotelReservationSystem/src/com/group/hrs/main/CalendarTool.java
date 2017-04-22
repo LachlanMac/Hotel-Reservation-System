@@ -37,6 +37,7 @@ import javax.swing.border.EtchedBorder;
 ||    
 ||    Inherits From:  [CalendarTool inherits from Swing Component JFrame]
 |+-----------------------------------------------------------------------*/
+
 public class CalendarTool extends JFrame {
 
 	/********************************************

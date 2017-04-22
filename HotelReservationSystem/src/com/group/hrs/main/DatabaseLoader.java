@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+//author Alexander Lyos
 public class DatabaseLoader {
 
 	// Serach database for ID and get all customer information
