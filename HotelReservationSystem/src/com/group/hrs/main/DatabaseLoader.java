@@ -17,9 +17,9 @@ import java.util.List;
 public class DatabaseLoader {
 
 	// Serach database for ID and get all customer information
-	String host = "jdbc:mysql://" + SQLLoader.host + "/HotelReservation";
-	String username = SQLLoader.user;
-	String password = SQLLoader.password;
+	String host = SQLLoader.getSQLString();
+	String username = SQLLoader.getUserNamee();
+	String password = SQLLoader.getPassword();
 
 	public Reservation getReservationByID(int reservationID) throws SQLException {
 		// Statement that connects to database

@@ -1,3 +1,5 @@
 root
 Movingon1
 localhost:3306
+hotelreservation
+mysql
