@@ -9,8 +9,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -20,67 +18,101 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+/*+----------------------------------------------------------------------
+||
+||  Class [RForm] 
+||
+||         Author:  [Lachlan McCallum]
+||
+||    Purpose:  [This class is responsible for building forms based on creating
+||				a blank reservation or modifying an existing reservation.  The form has
+||				a submit function that creates a reservation object and submits it to the
+||				database.]           
+|+-----------------------------------------------------------------------*/
 public class RForm {
 
-	String[] states = { "select state", "ALABAMA", "ALASKA", "ARIZONA", "ARKANSAS", "CALIFORNIA", "COLORADO",
+	/********************************************
+	 * CLASS VARIABLES
+	 *******************************************/
+
+	// String of states used in a JComboBox
+	private String[] states = { "select state", "ALABAMA", "ALASKA", "ARIZONA", "ARKANSAS", "CALIFORNIA", "COLORADO",
 			"CONNECTICUT", "DELAWARE", "FLORIDA", "GEORGIA", "HAWAII", "IDAHO", "ILLINOIS", "INDIANA", "IOWA", "KANSAS",
 			"KENTUCKY", "LOUISIANA", "MAINE", "MARYLAND", "MASSACHUSETTS", "MICHIGAN", "MINNESOTA", "MISSISSIPPI",
 			"MISSOURI", "MONTANA", "NEBRASKA", "NEVADA", "NEW HAMPSHIRE", "NEW JERSEY", "NEW MEXICO", "NEW YORK",
 			"NORTH CAROLINA", "NORTH DAKOTA", "OHIO", "OKLAHOMA", "OREGON", "PENNSYLVANIA", "RHODE ISLAND",
 			"SOUTH CAROLINA", "SOUTH DAKOTA", "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON",
 			"WEST VIRGINIA", "WISCONSIN", "WYOMING" };
+	// Reservation Declaration
+	private Reservation currentReservation;
+	// CalendarTool Declaration
+	private CalendarTool calObject;
 
-	Reservation currentReservation;
-	CalendarTool calObject;
+	/********************************************
+	 * SWING VARIABLES
+	 *******************************************/
+	// arrays to hold swing components for iteration
+	private JLabel[] labels;
+	private JTextField[] textFields;
 
-	JLabel[] labels;
-	JTextField[] textFields;
-	JFrame form;
-	JPanel formPanel, calendarPanel, actionpanel;
-	JComboBox<String> stateCombo;
-	SpringLayout layout;
-	JButton calendarTool;
-	Dimension dim = new Dimension(600, 600);
-
-	JLabel id_Label, fName_Label, lName_Label, streetAddress_Label, city_Label, zip_Label, email_Label, phone_Label,
-			room_Label, checkin_Label, checkout_Label;
-
-	JTextField id_Field, fName_Field, lName_Field, streetAddress_Field, city_Field, zip_Field, email_Field, phone_Field,
-			room_Field, checkin_Field, checkout_Field;
-
+	private JFrame form;
+	private JPanel formPanel, calendarPanel, actionpanel;
+	// combobox that holds states
+	private JComboBox<String> stateCombo;
+	// Layout Manager
+	private SpringLayout layout;
+	private JButton calendarTool;
+	// Preferred size of form
+	private Dimension dim = new Dimension(600, 600);
+	// Labels
+	private JLabel id_Label, fName_Label, lName_Label, streetAddress_Label, city_Label, zip_Label, email_Label,
+			phone_Label, room_Label, checkin_Label, checkout_Label;
+	// TextFields
+	private JTextField id_Field, fName_Field, lName_Field, streetAddress_Field, city_Field, zip_Field, email_Field,
+			phone_Field, room_Field, checkin_Field, checkout_Field;
+	// Custom JButton classes
 	JButton cancel = new JButton("Cancel Reservation");
 	JButton submit = new JButton("Submit Reservation");
 
+	/********************************************
+	 * CREATE NEW FORM CONSTRUCTOR
+	 *******************************************/
 	public RForm() {
+		// creates a blank form
 		createForm();
+		// cannot cancel an unsubmitted reservation
 		cancel.setEnabled(false);
 	}
 
+	/********************************************
+	 * MODIFY FORM CONSTRUCTOR
+	 *******************************************/
 	public RForm(Reservation r) {
-
+		// set class variable reservation
 		this.currentReservation = r;
-		
-		if(currentReservation.getID() == 0){
-			JOptionPane.showMessageDialog(new JFrame(), "Reservation ID doesn't exist.",
-					"ID DOES NOT EXIST ERROR", JOptionPane.ERROR_MESSAGE);
+		// if ID is Zero, then the reservation wasn't found
+		if (currentReservation.getID() == 0) {
+			// Display error message
+			JOptionPane.showMessageDialog(new JFrame(), "Reservation ID doesn't exist.", "ID DOES NOT EXIST ERROR",
+					JOptionPane.ERROR_MESSAGE);
+			// exit method
 			return;
-			
+
 		}
+		// creates the form that will be populated
 		loadForm();
-
+		// enable cancel button because a reservation can be canceled
 		cancel.setEnabled(true);
-
+		// fill form with reservation data
 		fillForm();
 
 	}
 
-	public Reservation getCurrentReservation() {
-		return currentReservation;
-
-	}
-
+	/********************************************
+	 * fillForm Method : This method fills a form with data from a reservation
+	 *******************************************/
 	public void fillForm() {
-		
+		// set all fields by using reservation getters
 		id_Field.setText(Integer.toString(currentReservation.getID()));
 		fName_Field.setText(currentReservation.getFirstName());
 		lName_Field.setText(currentReservation.getLastName());
@@ -93,25 +125,22 @@ public class RForm {
 		checkin_Field.setText(currentReservation.getInDate());
 		checkout_Field.setText(currentReservation.getOutDate());
 
+		// find what state matches the state in reservation and set combobox
 		for (int i = 1; i < states.length; i++) {
 			if (states[i].equals(currentReservation.getState())) {
 				stateCombo.setSelectedItem(states[i]);
-			} else {
-				
 			}
 		}
 
 	}
-
-	public String getCheckout_Field() {
-		return checkout_Field.getText();
-	}
-
-	public String getCheckIn_Field() {
-		return checkin_Field.getText();
-	}
-
+	
+	/********************************************
+	 * buildForm Method : This method builds the initial form with out
+	 * any fields set.   
+	 *******************************************/
 	public void buildForm() {
+		
+		//Initialize JFrame and Parameters
 		form = new JFrame();
 		form.setTitle("Reservation Form");
 		form.setSize(dim);
@@ -119,7 +148,7 @@ public class RForm {
 		form.setLocationRelativeTo(null);
 		form.setLayout(new BorderLayout());
 		layout = new SpringLayout();
-
+		
 		calendarPanel = new JPanel();
 
 		actionpanel = new JPanel();
@@ -257,17 +286,13 @@ public class RForm {
 		checkin_Field.setEnabled(false);
 		checkout_Field.setEnabled(false);
 		stateCombo.setEnabled(false);
-		
+
 		calendarTool.setEnabled(false);
 
 	}
 
 	public void loadForm() {
-		
-		
-		
-		
-		
+
 		buildForm();
 
 		cancel.addActionListener(new ActionListener() {
@@ -358,7 +383,7 @@ public class RForm {
 
 						DatabaseLoader dbl = new DatabaseLoader();
 						dbl.submitReservation(currentReservation);
-						
+
 						JOptionPane.showMessageDialog(null, "Reservation Submitted");
 						disableAllButtons();
 
@@ -453,6 +478,20 @@ public class RForm {
 
 			}
 		});
+
+	}
+
+	
+	public String getCheckout_Field() {
+		return checkout_Field.getText();
+	}
+
+	public String getCheckIn_Field() {
+		return checkin_Field.getText();
+	}
+	
+	public Reservation getCurrentReservation() {
+		return currentReservation;
 
 	}
 

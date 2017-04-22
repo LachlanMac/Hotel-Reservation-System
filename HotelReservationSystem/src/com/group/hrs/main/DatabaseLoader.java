@@ -15,7 +15,7 @@ import java.util.List;
 public class DatabaseLoader {
 
 	// Serach database for ID and get all customer information
-	String host = "jdbc:mysql://"+SQLLoader.host+"/HotelReservation";
+	String host = "jdbc:mysql://" + SQLLoader.host + "/HotelReservation";
 	String username = SQLLoader.user;
 	String password = SQLLoader.password;
 
@@ -92,107 +92,159 @@ public class DatabaseLoader {
 	}
 
 	public void deleteReservationByID(int reservationID) throws SQLException {
-        // Statement that connects to database
-        Connection con = DriverManager.getConnection(host, username, password);
-        int customerID = 0;
-        int roomID = 0;
+		// Statement that connects to database
+		Connection con = DriverManager.getConnection(host, username, password);
+		int customerID = 0;
+		int roomID = 0;
 
-        // Statement that will search for reservation by reservationID
-        PreparedStatement reservationStatement = con.prepareStatement("SELECT * FROM Reservation WHERE ReservationID = ?");
-        reservationStatement.setInt(1, reservationID);
-        ResultSet rs = reservationStatement.executeQuery();
+		// Statement that will search for reservation by reservationID
+		PreparedStatement reservationStatement = con
+				.prepareStatement("SELECT * FROM Reservation WHERE ReservationID = ?");
+		reservationStatement.setInt(1, reservationID);
+		ResultSet rs = reservationStatement.executeQuery();
 
-        while (rs.next()) {
-            customerID = rs.getInt("CustomerID");
-            roomID = rs.getInt("RoomID");
-        }
+		while (rs.next()) {
+			customerID = rs.getInt("CustomerID");
+			roomID = rs.getInt("RoomID");
+		}
 
-        PreparedStatement deleteReservation = con.prepareStatement("DELETE FROM Reservation WHERE ReservationID = ?");
-        deleteReservation.setInt(1, reservationID);
-        deleteReservation.execute();
-        
-        PreparedStatement deleteRoomBindedToCustomer = con.prepareStatement("UPDATE Room SET CustomerID = null WHERE RoomID = ?");
-        deleteRoomBindedToCustomer.setInt(1, roomID);
-        deleteRoomBindedToCustomer.execute();
-        
-        PreparedStatement deleteCustomer = con.prepareStatement("DELETE FROM Customer WHERE CustomerID = ?");
-        deleteCustomer.setInt(1, customerID);
-        deleteCustomer.execute();
-    }
-	
-    public Reservation getReservationByName(String firstName, String lastName) throws SQLException {
-        // Statement that connects to database
-        Connection con = DriverManager.getConnection(host, username, password);
-        Reservation reservation = new Reservation();
-        
-        // Variables
-        int roomID = 0;
+		PreparedStatement deleteReservation = con.prepareStatement("DELETE FROM Reservation WHERE ReservationID = ?");
+		deleteReservation.setInt(1, reservationID);
+		deleteReservation.execute();
 
-        // Variables that will be displayed
-        int rID = 0;
-        int roomNumber = 0;
+		PreparedStatement deleteRoomBindedToCustomer = con
+				.prepareStatement("UPDATE Room SET CustomerID = null WHERE RoomID = ?");
+		deleteRoomBindedToCustomer.setInt(1, roomID);
+		deleteRoomBindedToCustomer.execute();
 
-        String firstname = "";
-        String lastname = "";
-        String street = "";
-        String city = "";
-        String state = "";
-        String zipCode = "";
-        String emailAddress = "";
-        String phoneNumber = "";
+		PreparedStatement deleteCustomer = con.prepareStatement("DELETE FROM Customer WHERE CustomerID = ?");
+		deleteCustomer.setInt(1, customerID);
+		deleteCustomer.execute();
+	}
 
-        String checkInDate = "";
-        String checkOutDate = "";
+	public ArrayList<Reservation> getResByName(String firstName, String lastName) throws SQLException {
 
-        
-        PreparedStatement reservationStatement = con
-                .prepareStatement("SELECT * FROM Reservation WHERE ReservationID = ?");
-        reservationStatement.setInt(1, reservation.getID());
-        ResultSet rs = reservationStatement.executeQuery();
+		ArrayList<Reservation> resList = new ArrayList<Reservation>();
 
-        // Initialize variables
-        while (rs.next()) {
-            rID = rs.getInt("ReservationID");
-            roomID = rs.getInt("RoomID");
-            checkInDate = rs.getString("StartDate");
-            checkOutDate = rs.getString("EndDate");
-        }
+		Connection con = DriverManager.getConnection(host, username, password);
 
-        // Statement that will search for room connected to the reservation
-        PreparedStatement roomStatement = con.prepareStatement("SELECT * FROM Room WHERE RoomID = ?");
-        roomStatement.setInt(1, roomID);
-        ResultSet rs2 = roomStatement.executeQuery();
+		PreparedStatement searchCustomer = con
+				.prepareStatement("SELECT * FROM Customer WHERE Firstname = ? AND Lastname = ?");
+		searchCustomer.setString(1, firstName);
+		searchCustomer.setString(2, lastName);
+		ResultSet rs = searchCustomer.executeQuery();
+		int customerID = 0;
+		int counter = 0;
 
-        // Initialize room number variable
-        while (rs2.next()) {
-            roomNumber = rs2.getInt("Room_Number");
-        }
+		while (rs.next()) {
+			Reservation r = new Reservation();
 
-        // Statement that will search for customer connected to the reservation
-        PreparedStatement customerStatement = con.prepareStatement("SELECT * FROM Customer WHERE firstName = ? AND lastName = ?");
-        customerStatement.setString(1, firstName);
-        customerStatement.setString(1, lastName);
-        ResultSet rs3 = customerStatement.executeQuery();
+			customerID = rs.getInt("CustomerID");
 
-        // Intialize firstname and lastname variables
-        while (rs3.next()) {
-            firstname = rs3.getString("Firstname");
-            lastname = rs3.getString("Lastname");
-            street = rs3.getString("Street");
-            city = rs3.getString("City");
-            state = rs3.getString("State");
-            zipCode = rs3.getString("ZipCode");
-            emailAddress = rs3.getString("EmailAddress");
-            phoneNumber = rs3.getString("PhoneNumber");
-        }
+			r.setFirstName(rs.getString("Firstname"));
+			r.setLastName(rs.getString("Lastname"));
+			r.setStreet(rs.getString("Street"));
+			r.setCity(rs.getString("City"));
+			r.setState(rs.getString("State"));
+			r.setZip(rs.getString("ZipCode"));
+			r.setEmail(rs.getString("EmailAddress"));
+			r.setPhone(rs.getString("PhoneNumber"));
 
-        Reservation data = new Reservation(rID, roomID, firstname, lastname, street, city, state, zipCode, emailAddress,
-                phoneNumber, checkInDate, checkOutDate);
-        return data;
+			PreparedStatement searchReservation = con
+					.prepareStatement("SELECT * FROM Reservation WHERE CustomerID = ? ");
+			searchReservation.setInt(1, customerID);
+			ResultSet rs2 = searchReservation.executeQuery();
 
-    }
-	
-	
+			while (rs2.next()) {
+
+				r.setResID(rs2.getInt("ReservationID"));
+				r.setRoom(rs2.getInt("RoomID"));
+				r.setCheckInDate(rs2.getString("StartDate"));
+				r.setCheckOutDate(rs2.getString("EndDate"));
+			}
+
+			resList.add(r);
+
+		}
+
+		return resList;
+
+	}
+
+	public ArrayList getReservationByName(String firstName, String lastName) throws SQLException {
+		// Statement that connects to database
+		Connection con = DriverManager.getConnection(host, username, password);
+		Reservation reservation = new Reservation();
+
+		// ArrayList to hold customers with same names
+		ArrayList customerList = new ArrayList<>();
+
+		// Variables
+		int roomID = 0;
+		int customerID = 0;
+
+		// Variables that will be displayed
+		int rID = 0;
+		int roomNumber = 0;
+
+		String firstname = "";
+		String lastname = "";
+		String street = "";
+		String city = "";
+		String state = "";
+		String zipCode = "";
+		String emailAddress = "";
+		String phoneNumber = "";
+
+		String checkInDate = "";
+		String checkOutDate = "";
+
+		PreparedStatement searchCustomer = con
+				.prepareStatement("SELECT * FROM Customer WHERE Firstname = ? AND Lastname = ?");
+		searchCustomer.setString(1, firstName);
+		searchCustomer.setString(2, lastName);
+		ResultSet rs = searchCustomer.executeQuery();
+
+		// Initialize variables
+		while (rs.next()) {
+			customerID = rs.getInt("CustomerID");
+			firstname = rs.getString("Firstname");
+			lastname = rs.getString("Lastname");
+			street = rs.getString("Street");
+			city = rs.getString("City");
+			state = rs.getString("State");
+			zipCode = rs.getString("ZipCode");
+			emailAddress = rs.getString("EmailAddress");
+			phoneNumber = rs.getString("PhoneNumber");
+
+			// Adds to the arraylist their firstname and lastname, which is
+			// separated by a space
+			customerList.add(customerID + " " + firstname + " " + lastname);
+		}
+
+		PreparedStatement searchReservation = con.prepareStatement("SELECT * FROM Reservation WHERE CustomerID = ? ");
+		searchReservation.setInt(1, customerID);
+		ResultSet rs2 = searchReservation.executeQuery();
+
+		while (rs2.next()) {
+			rID = rs2.getInt("ReservationID");
+			roomID = rs2.getInt("RoomID");
+			checkInDate = rs2.getString("StartDate");
+			checkOutDate = rs2.getString("EndDate");
+		}
+
+		PreparedStatement searchRoom = con.prepareStatement("SELECT * FROM Room WHERE RoomID = ?");
+		searchRoom.setInt(1, roomID);
+		ResultSet rs3 = searchRoom.executeQuery();
+
+		while (rs3.next()) {
+			roomNumber = rs3.getInt("Room_Number");
+		}
+
+		// Returns the Arraylist of customers with identical names
+		return customerList;
+	}
+
 	// Return an array that displays avaliable rooms for the selected date
 	public boolean[] LookUpByDate(String date) throws SQLException {
 		// Statement that connects to database
@@ -301,7 +353,6 @@ public class DatabaseLoader {
 		//
 		ArrayList<String> getDates = new ArrayList<String>();
 		getDates = reservation.calculateDates(reservation.getInDate(), reservation.getOutDate());
-
 
 		for (String s : getDates) {
 
