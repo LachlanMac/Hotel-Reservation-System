@@ -1,5 +1,6 @@
 package com.group.hrs.main;
 
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -82,10 +83,15 @@ public class Reservation {
 		}
 
 		reservationDates.add(df.format(checkOut));
-		
-		
+
 		return reservationDates;
 
+	}
+
+	public ArrayList<String> getReservationDates(){
+		
+		return this.reservationDates;
+		
 	}
 
 	private Date parseDate(String date) {
@@ -170,11 +176,11 @@ public class Reservation {
 		return rRoomNumber;
 	}
 
-	public String getFirst() {
+	public String getFirstName() {
 		return rFirstName;
 	}
 
-	public String getLast() {
+	public String getLastName() {
 		return rLastName;
 	}
 

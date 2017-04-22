@@ -46,25 +46,60 @@ public class ReservationGUI {
 		create.addActionListener((ActionEvent event) -> {
 			createForm();
 		});
-		
-		
+
 		modify.addActionListener((ActionEvent event) -> {
-			
-			try {
-				modifyForm();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+
+			modifyForm();
+
 		});
-		/*
-		 * modify.addActionListener((ActionEvent event) -> { modifyForm(); });
-		 * 
-		 * submit.addActionListener((ActionEvent event) -> {
-		 * 
-		 * });
-		 */
+
+	}
+
+	public void modifyForm() {
+		String[] values = { "ID", "NAME" };
+
+		Object selected = JOptionPane.showInputDialog(null, "Search Reservation By:", "Selection",
+				JOptionPane.DEFAULT_OPTION, null, values, "0");
+		if (selected != null) {// null if the user cancels.
+			String selectedString = selected.toString();
+			if (selectedString.equals(values[0])) {
+
+				searchByID();
+			} else if (selectedString.equals(values[1])) {
+
+				searchByName();
+
+			}
+
+		} else {
+			// ITS NULL
+		}
+
+	}
+
+	public void searchByID() {
+
+		String reservationID = JOptionPane.showInputDialog("Enter Reservation ID :");
+
+		try {
+			int id = Integer.parseInt(reservationID);
+			DatabaseLoader dbl = new DatabaseLoader();
+			
+			
+			Reservation r = dbl.getReservationByID(id);
+			
+			
+			new RForm(r);
+		
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(frame, "Please enter a valid number");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void searchByName() {
 
 	}
 
@@ -94,48 +129,6 @@ public class ReservationGUI {
 	private void createForm() {
 		RForm form = new RForm();
 
-	}
-
-	private void modifyForm() throws SQLException {
-		JPanel panel3 = new JPanel();
-		JFrame frame2 = new JFrame("Modification Form");
-		frame2.setSize(200, 200);
-		frame2.setLayout(new GridLayout(2, 1));
-		JLabel mod = new JLabel("Modify Reservation", JLabel.CENTER);
-		frame2.add(mod);
-		frame2.add(panel3);
-
-		JLabel search = new JLabel("Enter reservation ID: ", JLabel.CENTER);
-		JTextField searchField = new JTextField(10);
-		JButton submit = new JButton("Submit");
-		panel3.setLayout(new FlowLayout());
-		panel3.add(search);
-		panel3.add(searchField);
-		panel3.add(submit);
-		frame2.setVisible(true);
-		frame2.setLocationRelativeTo(null);
-
-		submit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (search.getText().equals("")) {
-					JOptionPane.showMessageDialog(frame2, "Please enter a reservation ID");
-				} else {
-					DatabaseLoader b = new DatabaseLoader();
-					try {
-						
-						int temp = Integer.parseInt(searchField.getText());
-						b.getReservationByID(Integer.parseInt(searchField.getText()));
-					} catch (SQLException ex) {
-						
-					} catch (NumberFormatException ex){
-						ex.printStackTrace();
-						
-					}
-					
-				}
-			}
-		});
 	}
 
 }
