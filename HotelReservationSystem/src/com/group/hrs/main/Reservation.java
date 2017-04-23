@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-
 //AUTHOR : Lachlan McCallum Geoffery Quintern
 
 public class Reservation {
@@ -91,10 +90,10 @@ public class Reservation {
 
 	}
 
-	public ArrayList<String> getReservationDates(){
-		
+	public ArrayList<String> getReservationDates() {
+
 		return this.reservationDates;
-		
+
 	}
 
 	private Date parseDate(String date) {
@@ -107,6 +106,15 @@ public class Reservation {
 		cal.set(year, month, day, 0, 0);
 		return cal.getTime();
 
+	}
+
+	public String getDateString(String type) {
+
+		DateFormat df2 = new SimpleDateFormat("MMMM dd, yyyy");
+		Date d = parseDate(type);
+		String newDate = df2.format(d);
+
+		return newDate;
 	}
 
 	public String toString() {

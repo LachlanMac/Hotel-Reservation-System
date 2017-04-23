@@ -1,0 +1,9 @@
+Confirmation Number: <<confirmNbr>> <>
+
+Dear <<First>> <<Last>>, <>
+
+We are sorry that you have chosen to cancel your reservation with us. <1>
+We hope that in the future you will choose us as your next place to stay <1>
+on your next trip. <>
+
+On behalf of management, thank you. <>

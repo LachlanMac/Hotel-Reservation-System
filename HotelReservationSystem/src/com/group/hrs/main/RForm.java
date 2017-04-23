@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -295,6 +296,12 @@ public class RForm {
 						dbl.submitReservation(currentReservation);
 						// show confirmation
 						JOptionPane.showMessageDialog(null, "Reservation Created");
+						try {
+							BookingConfirmation confirm = new BookingConfirmation("create", currentReservation);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						submit.setBackground(Color.green);
 						disableAllButtons();
 
@@ -329,7 +336,7 @@ public class RForm {
 			public void actionPerformed(ActionEvent arg0) {
 				// tracks if yes or no is pressed when prompting to cancel
 				// reservation
-				int response = JOptionPane.showConfirmDialog(null, "Are you sure you wish to cancel reservatioN?",
+				int response = JOptionPane.showConfirmDialog(null, "Are you sure you wish to cancel reservation?",
 						"Cancel Confirmation", JOptionPane.YES_NO_OPTION);
 				// if yes
 				if (response == JOptionPane.YES_OPTION) {
@@ -339,6 +346,12 @@ public class RForm {
 						// Delete reservation by passing the ID
 						dbl.deleteReservationByID(currentReservation.getID());
 					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					try {
+						BookingConfirmation delete = new BookingConfirmation("delete", currentReservation);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					// Show confirmation

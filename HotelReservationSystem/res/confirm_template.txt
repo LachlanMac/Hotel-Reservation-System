@@ -1,0 +1,13 @@
+Confirmation Number: <<confirmNbr>> <>
+
+Dear <<First>> <<Last>>, <>
+
+Thank you for making the choice to stay with us on your upcoming trip. <1>
+Keep this confirmation notice for your records for your upcoming stay. <>
+
+On behalf of management, thank you. <>
+
+Reservation Information: <1>
+Dates: <<checkIn>> to <<checkOut>> <1>
+Room Number: <<roomNum>> <1>
+Estimated Cost: <<cost>> <1>

@@ -93,6 +93,9 @@ public class DatabaseLoader {
 
 	}
 
+	
+	
+	
 	public void deleteReservationByID(int reservationID) throws SQLException {
 		// Statement that connects to database
 		Connection con = DriverManager.getConnection(host, username, password);
