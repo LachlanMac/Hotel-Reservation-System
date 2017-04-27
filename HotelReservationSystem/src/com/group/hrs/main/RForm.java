@@ -408,8 +408,28 @@ public class RForm {
 	 *******************************************/
 	public boolean verifyForm() {
 		// checks state field to make sure it is not default value
-		if (currentReservation.getState().equals("select state")) {
+		if (stateCombo.getSelectedIndex() == 0) {
 			JOptionPane.showMessageDialog(form, "Please select a state.");
+			return false;
+		}
+		// checks first name field to see if valid
+		else if (fName_Field.getText().trim().length() < 2) {
+			JOptionPane.showMessageDialog(form, "Please select a valid first name.");
+			return false;
+		}
+		// checks last name field to see if valid
+		else if (lName_Field.getText().trim().length() < 2) {
+			JOptionPane.showMessageDialog(form, "Please select a valid last name.");
+			return false;
+		}
+		// checks last name field to see if valid
+		else if (streetAddress_Field.getText().trim().length() < 2) {
+			JOptionPane.showMessageDialog(form, "Please select a valid street address.");
+			return false;
+		}
+		// checks last name field to see if valid
+		else if (city_Field.getText().trim().length() < 2) {
+			JOptionPane.showMessageDialog(form, "Please select a valid city.");
 			return false;
 		}
 		// checks zip code field
@@ -508,7 +528,7 @@ public class RForm {
 	}// END METHOD
 
 	/********************************************
-	 				* GETTERSs *
+	 * GETTERSs *
 	 *******************************************/
 
 	public String getCheckout_Field() {
@@ -531,7 +551,7 @@ public class RForm {
 	}
 
 	/********************************************
-	 				* SETTERS *
+	 * SETTERS *
 	 *******************************************/
 	public void setCheckoutDate(String checkout) {
 
@@ -544,4 +564,4 @@ public class RForm {
 		this.room_Field.setText(roomNum);
 
 	}
-}//END CLASS
+}// END CLASS
