@@ -12,14 +12,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
 //author Alexander Lyos
 public class DatabaseLoader {
 
 	// Serach database for ID and get all customer information
-	String host = SQLLoader.getSQLString();
-	String username = SQLLoader.getUserNamee();
-	String password = SQLLoader.getPassword();
+	private static String host = SQLLoader.getSQLString();
+	private static String username = SQLLoader.getUserNamee();
+	private static String password = SQLLoader.getPassword();
 
 	public Reservation getReservationByID(int reservationID) throws SQLException {
 		// Statement that connects to database
@@ -93,9 +92,6 @@ public class DatabaseLoader {
 
 	}
 
-	
-	
-	
 	public void deleteReservationByID(int reservationID) throws SQLException {
 		// Statement that connects to database
 		Connection con = DriverManager.getConnection(host, username, password);
@@ -424,5 +420,80 @@ public class DatabaseLoader {
 		}
 
 	}// end method
+
+	public static void failedLoginAttempt(String employee) {
+		try {
+
+			int attempts = 0;
+			Connection con = DriverManager.getConnection(host, username, password);
+
+			PreparedStatement failedLogin = con
+					.prepareStatement("SELECT LoginAttempts FROM Employee WHERE Username = ?");
+			failedLogin.setString(1, employee);
+			ResultSet rs = failedLogin.executeQuery();
+
+			while (rs.next()) {
+
+				attempts = rs.getInt("LoginAttempts");
+				if (attempts >= 2) {
+
+					PreparedStatement lockAccount = con
+							.prepareStatement("UPDATE employee SET AccountLocked = ? WHERE Username = ?");
+					lockAccount.setBoolean(1, true);
+					lockAccount.setString(2, employee);
+					lockAccount.executeUpdate();
+
+				}
+
+				PreparedStatement addAttempt = con
+						.prepareStatement("UPDATE employee SET LoginAttempts = ? WHERE Username = ?");
+				addAttempt.setString(2, employee);
+				int temp = attempts + 1;
+				addAttempt.setInt(1, temp);
+				addAttempt.executeUpdate();
+
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static boolean accountIsLocked(String employee) {
+		try {
+			Connection con = DriverManager.getConnection(host, username, password);
+
+			PreparedStatement lockCheck = con.prepareStatement("SELECT * FROM Employee WHERE FirstName = ?");
+			lockCheck.setString(1, employee);
+			ResultSet rs = lockCheck.executeQuery();
+
+			while (rs.next()) {
+				if (rs.getBoolean(7) == true) {
+					return true;
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+
+	}
+
+	public static void resetAttempts(String employee) {
+		try {
+			Connection con = DriverManager.getConnection(host, username, password);
+			PreparedStatement resetAttempts = con
+					.prepareStatement("UPDATE employee SET LoginAttempts = ? WHERE Username = ?");
+			resetAttempts.setString(2, employee);
+			resetAttempts.setInt(1, 0);
+			resetAttempts.executeUpdate();
+
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+	}
 
 }
